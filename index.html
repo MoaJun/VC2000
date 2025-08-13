@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><script>
+(function(){
+  let proxyEcharts = null;
+
+  let originInit = null;
+
+  const DefaultFontOptions = [
+      { key: 'xAxis', stylePath: 'xAxis.axisLabel' },
+      { key: 'yAxis', stylePath: 'yAxis.axisLabel' },
+      { key: 'legend', stylePath: 'legend.textStyle' },
+      { key: 'tooltip', stylePath: 'tooltip.textStyle' },
+      { key: 'title', stylePath: 'title.textStyle' },
+      { key: 'series', stylePath: 'series.n.label', isArray: true },
+  ];
+
+  function setVal(source, keys, val, setFn) {
+      if (!Array.isArray(keys)) {
+          keys = keys.split('.');
+      }
+      keys = [...keys];
+      const valKey = keys.pop();
+      while (keys.length) {
+          const parentKey = keys.shift();
+          if (typeof source[parentKey] !== 'object' && typeof source[parentKey] !== 'function') {
+              const childKey = keys[0] === undefined ? valKey : keys[0];
+              let newVal = {};
+              if (!isNaN(childKey * 1)) {
+                  newVal = [];
+              }
+              if (setFn) {
+                  setFn(source, parentKey, newVal);
+              } else {
+                  source[parentKey] = newVal;
+              }
+          }
+          source = source[parentKey];
+      }
+      if (setFn) {
+          setFn(source, valKey, val);
+      } else {
+          source[valKey] = val;
+      }
+  }
+
+  function setFontFamily(options) {
+      return options;
+  }
+
+  function setSeriesFamily(options) {
+      if (options.series) {
+          options.series = options.series.map(item => {
+              item.label = { ...item.label };
+              return item;
+          });
+      }
+      return options;
+  }
+
+
+  function addResizeListener(echartsInstance) {
+      const mountDom = echartsInstance.getDom();
+      const resizeObserver = new ResizeObserver(() => {
+          echartsInstance.resize();
+      });
+      resizeObserver.observe(mountDom);
+      return resizeObserver;
+  }
+
+  function proxyInit(...arg) {
+      if (!originInit) return null;
+      let instance = null;
+      try {
+        instance = originInit.apply(this, arg);
+      } catch (e) {
+        console.error(e);
+        const div = document.createElement('div');
+        div.style.display = 'none';
+        document.body.appendChild(div);
+        instance = originInit.call(this, div);
+        document.body.removeChild(div);
+      }
+      const originSetOption = instance.setOption;
+      addResizeListener(instance);
+      instance.setOption = async function setOptionProxy(options) {
+          options = options || {};
+          options.animation = false;
+          try {
+            return originSetOption.call(this, options);
+          } catch (e) {
+            console.error(e);
+            return originSetOption.call(this, {});
+          }
+      };
+      return instance;
+  }
+
+  Object.defineProperty(globalThis, 'echarts', {
+      get() {
+          return proxyEcharts;
+      },
+      set(value) {
+          originInit = value.init;
+          defineInit(value);
+          proxyEcharts = value;
+      },
+      configurable: true,
+  });
+
+  function defineInit(value) {
+      Object.defineProperty(value, 'init', {
+          get() {
+              return proxyInit;
+          },
+          set(v) {
+              originInit = v;
+          },
+          enumerable: true,
+      });
+  }
+})()
+</script><script>console.warn = () => {};console.log = () => {};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BEAUKEN SUPPLEMENT - 高濃度ビタミンC 2000mg</title>
+<script src="js/tailwind.3.4.16.js"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#FFD700',
+secondary: '#FFF200'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="css/css2.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+
+<script>
+    // window.setInterval = () => {};
+    // window.clearInterval = () => {};
+    // window.setTimeout = () => {};
+    // window.clearTimeout = () => {};
+  </script><style>
+    /* 自定义滚动条样式 */
+    /* WebKit 浏览器 (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+        width: 0; /* 滚动条宽度 */
+        height: 0; /* 水平滚动条高度 */
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent; /* 轨道透明，使内容可见 */
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.5); /* 滚动条滑块颜色 */
+        border-radius: 4px; /* 滑块圆角 */
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.7); /* 悬停时颜色 */
+    }
+  </style><script>
+  window.addEventListener('load', () => {
+    if (typeof AOS !== 'undefined' && AOS) {
+      AOS.refresh?.();
+    }
+  });
+</script><script>(function () {
+  // 内存存储
+  const memoryStorage = {
+    local: new Map(),
+    session: new Map()
+  };
+
+  // 保存原始方法
+  // const originalLocalStorage = {
+  //   setItem: localStorage.setItem.bind(localStorage),
+  //   getItem: localStorage.getItem.bind(localStorage),
+  //   removeItem: localStorage.removeItem.bind(localStorage),
+  //   clear: localStorage.clear.bind(localStorage),
+  //   key: localStorage.key.bind(localStorage)
+  // };
+
+  // const originalSessionStorage = {
+  //   setItem: sessionStorage.setItem.bind(sessionStorage),
+  //   getItem: sessionStorage.getItem.bind(sessionStorage),
+  //   removeItem: sessionStorage.removeItem.bind(sessionStorage),
+  //   clear: sessionStorage.clear.bind(sessionStorage),
+  //   key: sessionStorage.key.bind(sessionStorage)
+  // };
+
+  // 只重写方法，不动属性
+  localStorage.setItem = function (key, value) {
+    memoryStorage.local.set(key, value);
+  };
+
+  localStorage.getItem = function (key) {
+    return memoryStorage.local.get(key) ?? null;
+  };
+
+  localStorage.removeItem = function (key) {
+    memoryStorage.local.delete(key);
+  };
+
+  localStorage.clear = function () {
+    memoryStorage.local.clear();
+  };
+
+  localStorage.key = function (n) {
+    return Array.from(memoryStorage.local.keys())[n] ?? null;
+  };
+
+  // sessionStorage 同样的处理
+  sessionStorage.setItem = function (key, value) {
+    memoryStorage.session.set(key, value);
+  };
+
+  sessionStorage.getItem = function (key) {
+    return memoryStorage.session.get(key) ?? null;
+  };
+
+  sessionStorage.removeItem = function (key) {
+    memoryStorage.session.delete(key);
+  };
+
+  sessionStorage.clear = function () {
+    memoryStorage.session.clear();
+  };
+
+  sessionStorage.key = function (n) {
+    return Array.from(memoryStorage.session.keys())[n] ?? null;
+  };
+})();
+</script><style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw... [truncated]
+<body class="bg-white text-gray-900">
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center">
+        <div class="font-['Pacifico'] text-xl md:text-2xl font-bold text-gray-900">logo</div>
+      </div>
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex space-x-8">
+        <a href="#" class="text-gray-700 hover:text-primary transition-colors">製品情報</a>
+        <a href="#" class="text-gray-700 hover:text-primary transition-colors">成分・効果</a>
+        <a href="#" class="text-gray-700 hover:text-primary transition-colors">お客様の声</a>
+        <a href="#" class="text-gray-700 hover:text-primary transition-colors">よくある質問</a>
+        <a href="#" class="text-gray-700 hover:text-primary transition-colors">お問い合わせ</a>
+      </nav>
+      <div class="flex items-center">
+        <button class="hidden md:block bg-primary text-gray-900 px-6 py-2 !rounded-button font-semibold hover:bg-secondary transition-colors whitespace-nowrap">
+          今すぐ購入
+        </button>
+        <!-- Hamburger Button -->
+        <div class="md:hidden">
+          <button id="hamburger-button" class="text-gray-700 hover:text-primary focus:outline-none">
+            <i class="ri-menu-line text-2xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Mobile Nav -->
+  <div id="mobile-menu" class="hidden md:hidden">
+    <nav class="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">製品情報</a>
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">成分・効果</a>
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">お客様の声</a>
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">よくある質問</a>
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">お問い合わせ</a>
+    </nav>
+    <div class="px-4 pb-4">
+        <button class="w-full bg-primary text-gray-900 px-6 py-2 !rounded-button font-semibold hover:bg-secondary transition-colors whitespace-nowrap">
+            今すぐ購入
+        </button>
+    </div>
+  </div>
+</header>
+<main>
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden animate-fadeIn">
+<div class="absolute inset-0" style="background: url('https://static.readdy.ai/image/d3a2db7198e1ff9b0725a9301a7913f7/d71d5efdb6f95ad33652a7ae78528a60.png') center/cover no-repeat; opacity: 0.15;"></div>
+<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div class="text-left">
+<div class="mb-6">
+<span class="bg-primary text-gray-900 px-4 py-2 rounded-full text-sm font-semibold">BEAUKEN SUPPLEMENT</span>
+</div>
+<h1 class="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+高濃度<br>
+<span class="text-primary">ビタミンC</span><br>
+<span class="text-4xl lg:text-5xl">もっと輝く自分へ</span>
+</h1>
+<p class="text-xl text-gray-600 mb-8 leading-relaxed">
+1包で2000mgの高濃度ビタミンCを摂取。<br>
+毎日の健康と美容をサポートする。<br>
+プレミアムサプリメント。
+</p>
+<div class="flex flex-wrap gap-4 mb-8">
+<div class="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-flask-line text-primary"></i>
+</div>
+<span class="text-sm font-medium">高濃度配合</span>
+</div>
+<div class="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-box-3-line text-primary"></i>
+</div>
+<span class="text-sm font-medium">30包入り</span>
+</div>
+<div class="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-medicine-bottle-line text-primary"></i>
+</div>
+<span class="text-sm font-medium">粒状タイプ</span>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="bg-primary text-gray-900 px-8 py-4 !rounded-button font-bold text-lg hover:bg-secondary transition-colors whitespace-nowrap">
+今すぐ購入する
+</button>
+<button class="border-2 border-gray-300 text-gray-700 px-8 py-4 !rounded-button font-semibold hover:border-primary hover:text-primary transition-colors whitespace-nowrap">
+詳細を見る
+</button>
+</div>
+</div>
+<div class="relative">
+<div class="relative z-10">
+<img src="images/忠実再現ビタミンCサプリメントLPヒーロー画像.png" alt="ビタミンC サプリメント" class="w-full h-auto object-contain">
+</div>
+<div class="absolute -top-8 -right-8 w-32 h-32 bg-primary opacity-20 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-8 -left-8 w-24 h-24 bg-secondary opacity-20 rounded-full blur-2xl"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 bg-gray-50 animate-fadeIn">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-6">なぜ BEAUKEN の<br>ビタミンC が選ばれるのか</h2>
+<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+厳選された高品質な原料と独自の製法により、<br>
+最高品質のビタミンC サプリメントをお届けします。
+</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 mx-auto">
+<i class="ri-flask-line text-2xl text-gray-900"></i>
+</div>
+<h3 class="text-2xl font-bold mb-4 text-center">高濃度 2000mg</h3>
+<p class="text-gray-600 text-center leading-relaxed">
+1日2,000mg（レモン約100個分）を１包に詰め込んでいます。<br>
+一回分が一袋だから計量する必要がない手軽で便利なスティックタイプです。
+</p>
+</div>
+<div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 mx-auto">
+<i class="ri-shield-check-line text-2xl text-gray-900"></i>
+</div>
+<h3 class="text-2xl font-bold mb-4 text-center">最高品質のイギリス産</h3>
+<p class="text-gray-600 text-center leading-relaxed">
+とうもろこし（遺伝子組み換えではない）などの植物から微生物の力を借りながら作られた合成ビタミンC。<br>
+イギリスの伝統ある工場で厳しい衛生管理のもと製造されています。
+</p>
+</div>
+<div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 mx-auto">
+<i class="ri-time-line text-2xl text-gray-900"></i>
+</div>
+<h3 class="text-2xl font-bold mb-4 text-center">ムダな成分が少ない</h3>
+<p class="text-gray-600 text-center leading-relaxed">
+粒タイプやチュアブルのサプリメントは固めるための成分や着色料、甘味料など余分な成分がたくさん含まれています。<br>
+BEAUKENのビタミンCは顆粒にすることで余計なものを極力排除しました。
+</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 animate-fadeIn">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
+<div>
+<h2 class="text-4xl font-bold mb-8">製品詳細情報</h2>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+<i class="ri-medicine-bottle-line text-gray-900"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">内容量</h3>
+<p class="text-gray-600">30包入り（約1ヶ月分）<br>1包あたり2.5g</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+<i class="ri-flask-line text-gray-900"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">主要成分</h3>
+<p class="text-gray-600">ビタミンC（アスコルビン酸）2000mg<br>分子式：C₆H₈O₆</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+<i class="ri-time-line text-gray-900"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">摂取方法</h3>
+<p class="text-gray-600">1日1包を目安に、水またはぬるま湯と<br>一緒にお召し上がりください</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+<i class="ri-shield-check-line text-gray-900"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">品質保証</h3>
+<p class="text-gray-600">GMP認定工場製造<br>第三者機関による品質検査済み</p>
+</div>
+</div>
+</div>
+</div>
+<div class="relative">
+<img src="images/409f83d80d1b7b65e864b236aa1f283a.jfif" alt="個包装パッケージ" class="w-full h-auto rounded-2xl shadow-lg object-top md:object-cover">
+<div class="absolute -top-4 -right-4 bg-primary text-gray-900 px-4 py-2 rounded-full font-bold text-sm">
+個包装で新鮮
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 bg-gray-50 animate-fadeIn">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-6">お好きな飲み物・食べ物に混ぜて</h2>
+<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+水、ジュース、炭酸水、ヨーグルトなど、好きな飲み物や食べ物に混ぜて<br>
+お召し上がりいただけます。<br>
+いつでもお召し上がりいただけますが<br>
+就寝前にお召し上がりいただくことをオススメしています。
+</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white p-6 rounded-xl text-center hover:shadow-lg transition-shadow">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
+<i class="ri-heart-pulse-line text-xl text-gray-900"></i>
+</div>
+<h3 class="font-bold mb-2">風邪予防</h3>
+<p class="text-sm text-gray-600">免疫力を高めて風邪や感染症から体を守ります</p>
+</div>
+<div class="bg-white p-6 rounded-xl text-center hover:shadow-lg transition-shadow">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
+<i class="ri-star-line text-xl text-gray-900"></i>
+</div>
+<h3 class="font-bold mb-2">美肌・美白</h3>
+<p class="text-sm text-gray-600">シミ・そばかすを防ぎ<br>透明感のある肌を実現</p>
+</div>
+<div class="bg-white p-6 rounded-xl text-center hover:shadow-lg transition-shadow">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
+<i class="ri-shield-line text-xl text-gray-900"></i>
+</div>
+<h3 class="font-bold mb-2">アンチエイジング</h3>
+<p class="text-sm text-gray-600">老化の原因となる活性酸素を除去し<br>若々しさをキープ</p>
+</div>
+<div class="bg-white p-6 rounded-xl text-center hover:shadow-lg transition-shadow">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
+<i class="ri-battery-charge-line text-xl text-gray-900"></i>
+</div>
+<h3 class="font-bold mb-2">疲労・ストレス対策</h3>
+<p class="text-sm text-gray-600">日々の疲れやストレスから体を守り<br>元気な毎日をサポート</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 bg-gray-50 animate-fadeIn">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-6">お客様の声</h2>
+<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+実際に BEAUKEN のビタミンC を<br>
+ご愛用いただいているお客様からの声をご紹介。
+</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-white p-8 rounded-2xl shadow-sm">
+<div class="flex items-center mb-6">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mr-4">
+<i class="ri-user-smile-line text-xl text-gray-900"></i>
+</div>
+<div>
+<div class="font-semibold">田中 美咲さん</div>
+<div class="text-sm text-gray-500">30代・会社員</div>
+</div>
+</div>
+<div class="text-gray-600 mb-4 leading-relaxed">
+毎日の習慣として飲んでいます。<br>
+手軽に高濃度のビタミンCが摂取できて、肌の調子も良くなってきました。<br>
+個包装なので持ち運びにも便利です。
+</div>
+<div class="flex items-center text-primary">
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+</div>
+</div>
+<div class="bg-white p-8 rounded-2xl shadow-sm">
+<div class="flex items-center mb-6">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mr-4">
+<i class="ri-user-smile-line text-xl text-gray-900"></i>
+</div>
+<div>
+<div class="font-semibold">山本 健一さん</div>
+<div class="text-sm text-gray-500">40代・自営業</div>
+</div>
+</div>
+<div class="text-gray-600 mb-4 leading-relaxed">
+仕事が忙しく疲れがちでしたが、このサプリを飲み始めてから体調が安定してきました。<br>
+特に風邪をひきにくくなった気がします。<br>
+価格も手頃で続けやすいです。
+</div>
+<div class="flex items-center text-primary">
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+</div>
+</div>
+<div class="bg-white p-8 rounded-2xl shadow-sm">
+<div class="flex items-center mb-6">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mr-4">
+<i class="ri-user-smile-line text-xl text-gray-900"></i>
+</div>
+<div>
+<div class="font-semibold">佐藤 優子さん</div>
+<div class="text-sm text-gray-500">50代・主婦</div>
+</div>
+</div>
+<div class="text-gray-600 mb-4 leading-relaxed">
+年齢とともに気になっていた肌のくすみに効果を感じています。<br>
+溶けやすく飲みやすいので、毎日の習慣として続けられています。<br>
+家族にもおすすめしています。
+</div>
+<div class="flex items-center text-primary">
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 animate-fadeIn">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+<div class="bg-gradient-to-r from-primary to-secondary p-12 rounded-3xl text-gray-900">
+<h2 class="text-4xl font-bold mb-6">今すぐ始める健康習慣</h2>
+<p class="text-xl mb-8 opacity-90">
+高濃度ビタミンC で毎日の健康と美容をサポート。<br>
+初回限定特別価格でお試しいただけます。
+</p>
+<div class="bg-white rounded-2xl p-8 mb-8 inline-block">
+<div class="text-center">
+<div class="text-sm text-gray-500 line-through mb-2">通常価格 ¥4,980</div>
+<div class="text-4xl font-bold text-primary mb-2">¥3,240</div>
+<div class="text-sm text-gray-600">初回限定価格（税込・送料無料）</div>
+<div class="text-xs text-red-600 mt-2 font-semibold">35% OFF</div>
+</div>
+</div>
+<div class="space-y-4">
+<button class="bg-gray-900 text-white px-12 py-4 !rounded-button font-bold text-lg hover:bg-gray-800 transition-colors whitespace-nowrap w-full sm:w-auto">
+今すぐ注文する
+</button>
+<div class="flex items-center justify-center gap-4 text-sm opacity-90">
+<div class="flex items-center gap-1">
+<i class="ri-truck-line"></i>
+<span>送料無料</span>
+</div>
+<div class="flex items-center gap-1">
+<i class="ri-shield-check-line"></i>
+<span>30日間返金保証</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<script id="scroll-effects">
+document.addEventListener('DOMContentLoaded', function() {
+const observerOptions = {
+threshold: 0.1,
+rootMargin: '0px 0px -50px 0px'
+};
+const observer = new IntersectionObserver(function(entries) {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+entry.target.classList.add('animate-fadeIn');
+}
+});
+}, observerOptions);
+document.querySelectorAll('section').forEach(section => {
+observer.observe(section);
+});
+});
+</script>
+<script id="smooth-scroll">
+document.addEventListener('DOMContentLoaded', function() {
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+anchor.addEventListener('click', function(e) {
+e.preventDefault();
+const target = document.querySelector(this.getAttribute('href'));
+if (target) {
+target.scrollIntoView({
+behavior: 'smooth',
+block: 'start'
+});
+}
+});
+});
+});
+</script>
+
+<script>
+      (function () {
+  'use strict';
+
+  const originalWindowOpen = window.originalWindowOpen ?? window.open;
+
+  function processAnchor(url) {
+    // 查找锚点，平滑滚动
+    const anchor = document.querySelector(url);
+    if (anchor) {
+      anchor.scrollIntoView({ behavior: 'smooth' });
+    }
+    // 发送 hashchange 事件
+    const event = new Event('hashchange');
+    event.newURL = url;
+    event.oldURL = window.location.href;
+    // 因为预览 iframe 没有 url，所以需要手动设置
+    window.location.hash = url;
+    window.dispatchEvent(event);
+  }
+
+  // 重写 window.open
+  window.open = function (url, target, features) {
+    if (url.startsWith('#')) {
+      // 查找锚点，平滑滚动
+      processAnchor(url);
+      return;
+    }
+    originalWindowOpen(url, '_blank', features);
+    return null;
+  };
+})();
+
+      
+  window.addEventListener('click', (event) => {
+    const target = event.target;
+    const closest = target.closest('a');
+    if (!closest) return;
+    if (closest.tagName === 'A') {
+      event.preventDefault();
+      const href = closest.getAttribute('href');
+      if (!href) return;
+      // check is void link
+      if (['#', 'javascript:void(0)', ''].includes(href)) {
+        return;
+      }
+      // 锚点链接也不处理
+      if (href.startsWith('#')) {
+        return;
+      }
+      window.open(closest.href, '_blank');
+    }
+  });
+
+      
+  document.addEventListener('submit', (event) => {
+    event.preventDefault();
+  }, true);
+
+    </script><design-editor-button style="display: none; z-index: 2147483647; position: fixed;"></design-editor-button><script id="hamburger-menu-script">
+document.addEventListener('DOMContentLoaded', function() {
+  const hamburgerButton = document.getElementById('hamburger-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  hamburgerButton.addEventListener('click', function() {
+    mobileMenu.classList.toggle('hidden');
+  });
+});
+</script>
+</body></html>
